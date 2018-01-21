@@ -456,9 +456,7 @@ public final class TableDefinition {
             statements.append(chunks.joined(separator: " "))
         }
         
-        let indexStatements = columns
-            .flatMap { $0.indexDefinition(in: name) }
-            .map { $0.sql() }
+        let indexStatements = columns.compactMap { $0.indexDefinition(in: name)?.sql() }
         statements.append(contentsOf: indexStatements)
         return statements.joined(separator: "; ")
     }

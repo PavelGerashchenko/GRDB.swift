@@ -31,7 +31,7 @@ class QueryInterfaceExpressionsTests: GRDBTestCase {
         dbWriter.add(collation: collation)
         
         customFunction = DatabaseFunction("avgOf", pure: true) { dbValues in
-            let sum = dbValues.flatMap { Int.fromDatabaseValue($0) }.reduce(0, +)
+            let sum = dbValues.compactMap { Int.fromDatabaseValue($0) }.reduce(0, +)
             return Double(sum) / Double(dbValues.count)
         }
         dbWriter.add(function: self.customFunction)

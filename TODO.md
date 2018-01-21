@@ -13,6 +13,10 @@
 - [ ] SQLite 3.22.0
     - [ ] Support for [FTS5 Initial Token Queries](https://sqlite.org/fts5.html#carrotq)
 
+Swift 4.1
+
+- [ ] Audit Cursor return types and make it look as much as possible as stdlib's lazy sequence
+
 GRDB 3.0
 
 - [ ] Make DatabasePool.write safe. See https://github.com/groue/GRDB.swift/commit/5e3c7d9c430df606a1cccfd4983be6b50e778a5c#commitcomment-26988970

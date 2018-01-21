@@ -662,7 +662,7 @@ Date.fetchCursor(...)   // DatabaseValueCursor<Date>
 Player.fetchCursor(...) // RecordCursor<Player>
 ```
 
-All cursor types adopt the [Cursor](http://groue.github.io/GRDB.swift/docs/2.7/Protocols/Cursor.html) protocol, which looks a lot like standard [lazy sequences](https://developer.apple.com/reference/swift/lazysequenceprotocol) of Swift. As such, cursors come with many methods: `contains`, `enumerated`, `filter`, `first`, `flatMap`, `forEach`, `joined`, `map`, `reduce`:
+All cursor types adopt the [Cursor](http://groue.github.io/GRDB.swift/docs/2.7/Protocols/Cursor.html) protocol, which looks a lot like standard [lazy sequences](https://developer.apple.com/reference/swift/lazysequenceprotocol) of Swift. As such, cursors come with many methods: `compactMap`, `contains`, `enumerated`, `filter`, `first`, `flatMap`, `forEach`, `joined`, `map`, `reduce`:
 
 ```swift
 // Iterate all Github links
@@ -1490,7 +1490,7 @@ When you don't provide any explicit *argumentCount*, the function can take any n
 
 ```swift
 let averageOf = DatabaseFunction("averageOf", pure: true) { (values: [DatabaseValue]) in
-    let doubles = values.flatMap { Double.fromDatabaseValue($0) }
+    let doubles = values.compactMap { Double.fromDatabaseValue($0) }
     return doubles.reduce(0, +) / Double(doubles.count)
 }
 dbQueue.add(function: averageOf)

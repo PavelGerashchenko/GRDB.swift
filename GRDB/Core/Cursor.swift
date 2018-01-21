@@ -53,7 +53,7 @@ extension Set {
 /// - `func enumerated()`
 /// - `func filter((Self.Element) throws -> Bool)`
 /// - `func first(where: (Self.Element) throws -> Bool)`
-/// - `func flatMap<ElementOfResult>((Self.Element) throws -> ElementOfResult?)`
+/// - `func compactMap<ElementOfResult>((Self.Element) throws -> ElementOfResult?)`
 /// - `func flatMap<SegmentOfResult>((Self.Element) throws -> SegmentOfResult)`
 /// - `func forEach((Self.Element) throws -> Void)`
 /// - `func joined()`
@@ -145,7 +145,14 @@ extension Cursor {
     
     /// Returns a cursor over the concatenated non-nil results of mapping
     /// transform over this cursor.
+    @available(*, deprecated, renamed: "compactMap")
     public func flatMap<ElementOfResult>(_ transform: @escaping (Element) throws -> ElementOfResult?) -> MapCursor<FilterCursor<MapCursor<Self, ElementOfResult?>>, ElementOfResult> {
+        return compactMap(transform)
+    }
+    
+    /// Returns a cursor over the concatenated non-nil results of mapping
+    /// transform over this cursor.
+    public func compactMap<ElementOfResult>(_ transform: @escaping (Element) throws -> ElementOfResult?) -> MapCursor<FilterCursor<MapCursor<Self, ElementOfResult?>>, ElementOfResult> {
         return map(transform).filter { $0 != nil }.map { $0! }
     }
     

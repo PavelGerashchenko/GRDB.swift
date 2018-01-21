@@ -829,12 +829,6 @@ extension Database {
             self.rawValue = rawValue
         }
         
-        /// The hash value
-        /// :nodoc:
-        public var hashValue: Int {
-            return rawValue.hashValue
-        }
-        
         /// The `BINARY` built-in SQL collation
         public static let binary = CollationName("BINARY")
         
@@ -864,12 +858,6 @@ extension Database {
         
         public init(_ rawValue: String) {
             self.rawValue = rawValue
-        }
-        
-        /// The hash value
-        /// :nodoc:
-        public var hashValue: Int {
-            return rawValue.hashValue
         }
         
         /// The `TEXT` SQL column type

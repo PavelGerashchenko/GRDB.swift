@@ -916,20 +916,13 @@ final class DAO {
 
 // MARK: - InsertQuery
 
-private struct InsertQuery {
+private struct InsertQuery : Hashable {
     let onConflict: Database.ConflictResolution
     let tableName: String
     let insertedColumns: [String]
-}
-
-extension InsertQuery : Hashable {
-    var hashValue: Int { return tableName.hashValue }
     
-    static func == (lhs: InsertQuery, rhs: InsertQuery) -> Bool {
-        if lhs.tableName != rhs.tableName { return false }
-        if lhs.onConflict != rhs.onConflict { return false }
-        return lhs.insertedColumns == rhs.insertedColumns
-    }
+    // TODO: remove custom lousy hashValue implementation when SE-0185 allows it
+    var hashValue: Int { return tableName.hashValue }
 }
 
 extension InsertQuery {
@@ -955,22 +948,14 @@ extension InsertQuery {
 
 // MARK: - UpdateQuery
 
-private struct UpdateQuery {
+private struct UpdateQuery : Hashable {
     let onConflict: Database.ConflictResolution
     let tableName: String
     let updatedColumns: [String]
     let conditionColumns: [String]
-}
-
-extension UpdateQuery : Hashable {
-    var hashValue: Int { return tableName.hashValue }
     
-    static func == (lhs: UpdateQuery, rhs: UpdateQuery) -> Bool {
-        if lhs.tableName != rhs.tableName { return false }
-        if lhs.onConflict != rhs.onConflict { return false }
-        if lhs.updatedColumns != rhs.updatedColumns { return false }
-        return lhs.conditionColumns == rhs.conditionColumns
-    }
+    // TODO: remove custom lousy hashValue implementation when SE-0185 allows it
+    var hashValue: Int { return tableName.hashValue }
 }
 
 extension UpdateQuery {

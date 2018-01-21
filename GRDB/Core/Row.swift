@@ -815,6 +815,13 @@ extension Row {
     /// The hash value
     /// :nodoc:
     public var hashValue: Int {
+        // Below is ideal implementation based on SE-0185:
+        // TODO: apply it when Swift supports it
+//        struct RowHashHelper: Hashable {
+//            let columnNames: [String]
+//            let databaseValues: [DatabaseValue]
+//        }
+//        return RowHashHelper(columns: columnNames, databaseValues: databaseValues).hashValue
         return columnNames.reduce(0) { (acc, column) in acc ^ column.hashValue } ^
             databaseValues.reduce(0) { (acc, dbValue) in acc ^ dbValue.hashValue }
     }

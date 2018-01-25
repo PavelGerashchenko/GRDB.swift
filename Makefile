@@ -2,6 +2,8 @@
 # =====
 #
 # make test - Run all tests but performance tests
+#   make test_framework_darwin - Run tests for iOS, macOS, watchOS, SPM on macOS
+#   make test_framework_linux - Run tests for Linux
 # make test_performance - Run performance tests
 # make documentation - Generate jazzy documentation
 # make clean - Remove build artifacts
@@ -16,12 +18,15 @@ default: test
 # Xcode >= 9.0, with iOS8.1 Simulator installed
 # CocoaPods ~> 1.2.0 - https://cocoapods.org
 # Carthage ~> 0.20.1 - https://github.com/carthage/carthage
+# Docker ~> 17.03.1 - https://www.docker.com/community-edition#/download
 # Jazzy ~> 0.7.4 - https://github.com/realm/jazzy
 
 CARTHAGE := $(shell command -v carthage)
+DOCKER := $(shell command -v docker)
 GIT := $(shell command -v git)
 JAZZY := $(shell command -v jazzy)
 POD := $(shell command -v pod)
+SWIFT := $(shell command -v swift)
 XCRUN := $(shell command -v xcrun)
 XCODEBUILD := set -o pipefail && $(shell command -v xcodebuild)
 
@@ -96,6 +101,7 @@ endif
 test: test_framework test_install
 
 test_framework: test_framework_darwin
+test_framework_linux
 test_framework_darwin: test_framework_GRDB test_framework_GRDBCustom test_framework_GRDBCipher test_SPM
 test_framework_GRDB: test_framework_GRDBOSX test_framework_GRDBWatchOS test_framework_GRDBiOS
 test_framework_GRDBCustom: test_framework_GRDBCustomSQLiteOSX test_framework_GRDBCustomSQLiteiOS
@@ -191,6 +197,15 @@ test_SPM:
 	$(SWIFT) build
 	$(SWIFT) build -c release
 	set -o pipefail && $(SWIFT) test $(XCPRETTY)
+
+test_framework_linux: Tests/LinuxMain.swift
+ifdef DOCKER
+	$(DOCKER) build --tag grdb .
+	$(DOCKER) run --rm grdb
+else
+	@echo Docker must be installed for test_framework_linux
+	@exit 1
+endif
 
 test_install_manual:
 	$(XCODEBUILD) \
@@ -292,6 +307,23 @@ SQLCipher: SQLCipher/src/sqlite3.h
 SQLCipher/src/sqlite3.h:
 	$(GIT) submodule update --init SQLCipher/src
 
+# Makes sure the Tests/LinuxMain.swift is up to date
+# Calling 'touch' is necessary because Sourcery doesn't update modification
+# time if file contents weren't changed.
+Tests/LinuxMain.swift: Tests/GRDBTests/*.swift | Sourcery/bin/sourcery
+	Sourcery/bin/sourcery --sources Tests/GRDBTests/ \
+		--templates Sourcery/Templates/LinuxMain.stencil \
+		--args testimports='@testable import GRDBTests' \
+		--output $@ \
+		&& touch $@
+
+# Install sourcery
+Sourcery/bin/sourcery:
+	mkdir -p Sourcery
+	cd Sourcery && \
+		curl -L "https://github.com/krzysztofzablocki/Sourcery/releases/download/0.6.0/Sourcery-0.6.0.zip" -o "Sourcery.zip" && \
+		unzip -q Sourcery.zip && \
+		rm -f Sourcery.zip
 
 # Documentation
 # =============
@@ -321,11 +353,14 @@ endif
 distclean:
 	$(GIT) reset --hard
 	$(GIT) clean -dffx .
+	rm -rf Documentation/Reference
+	rm -rf Sourcery
 	rm -rf Tests/Performance/fmdb && $(GIT) checkout -- Tests/Performance/fmdb
 	rm -rf Tests/Performance/SQLite.swift && $(GIT) checkout -- Tests/Performance/SQLite.swift
 	rm -rf Tests/Performance/Realm && $(GIT) checkout -- Tests/Performance/Realm
 	rm -rf SQLCipher/src && $(GIT) checkout -- SQLCipher/src
 	rm -rf SQLiteCustom/src && $(GIT) checkout -- SQLiteCustom/src
+	find . -name xcuserdata | xargs rm -rf
 
 clean:
 	$(SWIFT) package reset

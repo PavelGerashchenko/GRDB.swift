@@ -108,6 +108,9 @@ Pods
 .build
 Package.resolved
 Tests/SPM/Packages
+Tests/SPM/Package.pins
 
+# Linux support
+Sourcery/
 # Ruby
 .ruby-version

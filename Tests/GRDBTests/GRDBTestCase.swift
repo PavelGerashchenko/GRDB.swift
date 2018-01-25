@@ -1,5 +1,15 @@
 import XCTest
+
+#if os(Linux)
+    import Dispatch
+#endif
+#if SWIFT_PACKAGE
+    import CSQLite
+#endif
+
 #if GRDBCIPHER
+
+#if USING_SQLCIPHER
     @testable import GRDBCipher // @testable so that we have access to SQLiteConnectionWillClose
 #elseif GRDBCUSTOMSQLITE
     @testable import GRDBCustomSQLite // @testable so that we have access to SQLiteConnectionWillClose
@@ -32,7 +42,7 @@ class GRDBTestCase: XCTestCase {
     // Builds a database pool based on dbConfiguration
     func makeDatabasePool(filename: String? = nil) throws -> DatabasePool {
         try FileManager.default.createDirectory(atPath: dbDirectoryPath, withIntermediateDirectories: true, attributes: nil)
-        let dbPath = (dbDirectoryPath as NSString).appendingPathComponent(filename ?? ProcessInfo.processInfo.globallyUniqueString)
+        let dbPath = URL(fileURLWithPath: dbDirectoryPath).appendingPathComponent(filename).path
         let dbPool = try DatabasePool(path: dbPath, configuration: dbConfiguration)
         try setup(dbPool)
         return dbPool
@@ -64,7 +74,7 @@ class GRDBTestCase: XCTestCase {
         }
         
         let dbPoolDirectoryName = "GRDBTestCase-\(ProcessInfo.processInfo.globallyUniqueString)"
-        dbDirectoryPath = (NSTemporaryDirectory() as NSString).appendingPathComponent(dbPoolDirectoryName)
+        dbDirectoryPath = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(dbPoolDirectoryName).path
         do { try FileManager.default.removeItem(atPath: dbDirectoryPath) } catch { }
         
         dbConfiguration = Configuration()

@@ -1,3 +1,5 @@
+// ReferenceType is not yet implemented on Linux
+#if !os(Linux)
 import Foundation
 
 /// DatabaseValueConvertible is free for ReferenceConvertible types whose
@@ -38,4 +40,4 @@ public extension DatabaseValueConvertible where Self: Encodable & ReferenceConve
         // Preserve custom database encoding
         return (self as! ReferenceType).databaseValue
     }
-}
+#endif

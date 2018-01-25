@@ -9,9 +9,9 @@ import XCTest
 
 class DatabaseQueueTests: GRDBTestCase {
     
-    // Until SPM tests can load resources, disable this test for SPM.
-    #if !SWIFT_PACKAGE
     func testInvalidFileFormat() throws {
+        // Until SPM tests can load resources, disable this test for SPM.
+        #if !SWIFT_PACKAGE
         do {
             let testBundle = Bundle(for: type(of: self))
             let url = testBundle.url(forResource: "Betty", withExtension: "jpeg")!
@@ -31,8 +31,8 @@ class DatabaseQueueTests: GRDBTestCase {
                 "SQLite error 26: file is encrypted or is not a database",
                 "SQLite error 26: file is not a database"].contains(error.description))
         }
+        #endif
     }
-    #endif
     
     func testAddRemoveFunction() throws {
         // Adding a function and then removing it should succeed
@@ -68,7 +68,7 @@ class DatabaseQueueTests: GRDBTestCase {
         // Adding a collation and then removing it should succeed
         let dbQueue = try makeDatabaseQueue()
         let collation = DatabaseCollation("test_collation_foo") { (string1, string2) in
-            return (string1 as NSString).localizedStandardCompare(string2)
+            return string1.localizedStandardCompare(string2)
         }
         dbQueue.add(collation: collation)
         try dbQueue.inDatabase { db in

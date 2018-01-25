@@ -24,7 +24,7 @@ extension NSURL : DatabaseValueConvertible {
             // self.init(...)
             return cast(NSURL(string: string))
         #else
-            return self.init(string: string)
+            return cast(URL(string: string))//self.init(string: string)
         #endif
     }
 }

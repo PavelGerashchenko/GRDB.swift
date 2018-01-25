@@ -40,4 +40,5 @@ public extension DatabaseValueConvertible where Self: Encodable & ReferenceConve
         // Preserve custom database encoding
         return (self as! ReferenceType).databaseValue
     }
+}
 #endif

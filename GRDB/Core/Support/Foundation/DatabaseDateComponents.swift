@@ -155,15 +155,11 @@ public struct DatabaseDateComponents : DatabaseValueConvertible {
         
         // YYYY or HH
         var initialNumber: Int = 0
-        #if os(Linux)
-        if !scanner.scanInteger(&initialNumber) {
-            return nil
-        }
-        #else
+       
         if !scanner.scanInt(&initialNumber) {
             return nil
         }
-        #endif
+    
         switch scanner.scanLocation {
         case 2:
             // HH
@@ -227,57 +223,32 @@ public struct DatabaseDateComponents : DatabaseValueConvertible {
             
             // DD
             var day: Int = 0
-            #if os(Linux)
-            if scanner.scanInteger(&day) && day >= 1 && day <= 31 {
-                dateComponents.day = day
-            } else {
-                return nil
-            }
-            #else
+            
             if scanner.scanInt(&day) && day >= 1 && day <= 31 {
                 dateComponents.day = day
             } else {
                 return nil
             }
-            #endif
             
             // YYYY-MM-DD
-            #if os(Linux)
-            if scanner.atEnd {
-                return DatabaseDateComponents(dateComponents, format: .YMD)
-            }
-            #else
             if scanner.isAtEnd {
                 return DatabaseDateComponents(dateComponents, format: .YMD)
             }
-            #endif
             
             // T/space
-            #if os(Linux)
-            if nil == scanner.scanString(string: "T") && nil == scanner.scanString(string: " ") {
-                return nil
-            }
-            #else
             if !scanner.scanString("T", into: nil) && !scanner.scanString(" ", into: nil) {
                 return nil
             }
-            #endif
             
             // HH
             var hour: Int = 0
-            #if os(Linux)
-            if scanner.scanInteger(&hour) && hour >= 0 && hour <= 23 {
-                dateComponents.hour = hour
-            } else {
-                return nil
-            }
-            #else
+
             if scanner.scanInt(&hour) && hour >= 0 && hour <= 23 {
                 dateComponents.hour = hour
             } else {
                 return nil
             }
-            #endif
+            
             
         default:
             return nil

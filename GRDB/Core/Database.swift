@@ -297,23 +297,31 @@ extension Database {
                 db.configuration.trace!(sql)
             }, dbPointer)
         #else
-            if #available(iOS 10.0, OSX 10.12, watchOS 3.0, *) {
-                sqlite3_trace_v2(sqliteConnection, UInt32(SQLITE_TRACE_STMT), { (mask, dbPointer, stmt, unexpandedSQL) -> Int32 in
-                    guard let stmt = stmt else { return SQLITE_OK }
-                    guard let expandedSQLCString = sqlite3_expanded_sql(OpaquePointer(stmt)) else { return SQLITE_OK }
-                    let sql = String(cString: expandedSQLCString)
-                    sqlite3_free(expandedSQLCString)
-                    let db = Unmanaged<Database>.fromOpaque(dbPointer!).takeUnretainedValue()
-                    db.configuration.trace!(sql)
-                    return SQLITE_OK
-                }, dbPointer)
-            } else {
+            #if os(Linux)
                 sqlite3_trace(sqliteConnection, { (dbPointer, sql) in
                     guard let sql = sql.map({ String(cString: $0) }) else { return }
                     let db = Unmanaged<Database>.fromOpaque(dbPointer!).takeUnretainedValue()
                     db.configuration.trace!(sql)
                 }, dbPointer)
-            }
+            #else
+                if #available(iOS 10.0, OSX 10.12, watchOS 3.0, *) {
+                    sqlite3_trace_v2(sqliteConnection, UInt32(SQLITE_TRACE_STMT), { (mask, dbPointer, stmt, unexpandedSQL) -> Int32 in
+                        guard let stmt = stmt else { return SQLITE_OK }
+                        guard let expandedSQLCString = sqlite3_expanded_sql(OpaquePointer(stmt)) else { return SQLITE_OK }
+                        let sql = String(cString: expandedSQLCString)
+                        sqlite3_free(expandedSQLCString)
+                        let db = Unmanaged<Database>.fromOpaque(dbPointer!).takeUnretainedValue()
+                        db.configuration.trace!(sql)
+                        return SQLITE_OK
+                    }, dbPointer)
+                } else {
+                    sqlite3_trace(sqliteConnection, { (dbPointer, sql) in
+                        guard let sql = sql.map({ String(cString: $0) }) else { return }
+                        let db = Unmanaged<Database>.fromOpaque(dbPointer!).takeUnretainedValue()
+                        db.configuration.trace!(sql)
+                    }, dbPointer)
+                }
+            #endif
         #endif
     }
     

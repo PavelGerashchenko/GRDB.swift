@@ -4,6 +4,10 @@
     import SQLite3
 #endif
 
+#if os(Linux)
+    import Glibc
+#endif
+
 /// A protocol around sqlite3_set_authorizer
 protocol StatementAuthorizer : class {
     func authorize(

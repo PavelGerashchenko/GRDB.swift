@@ -1,5 +1,6 @@
 import Foundation
 
+#if !os(Linux)
 /// NSDate is stored in the database using the format
 /// "yyyy-MM-dd HH:mm:ss.SSS", in the UTC time zone.
 extension NSDate : DatabaseValueConvertible {
@@ -26,6 +27,7 @@ extension NSDate : DatabaseValueConvertible {
         return cast(date)
     }
 }
+#endif
 
 /// Date is stored in the database using the format
 /// "yyyy-MM-dd HH:mm:ss.SSS", in the UTC time zone.
